@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f7f9" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>천원사 직무 DNA 테스트</title>
+  <style>
+    :root{
+      --bg:#f6f7f9;--card:#fff;--text:#17202a;--muted:#667085;--line:#e5e7eb;
+      --accent:#285b9a;--accent-soft:#eaf2fb;--good:#1f7a4d;
+      --shadow:0 8px 26px rgba(20,31,45,.07);
+      --pad:22px;--radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","Segoe UI",Arial,sans-serif;line-height:1.55;word-break:keep-all;overflow-wrap:anywhere;-webkit-tap-highlight-color:transparent}
+    body.modal-open{overflow:hidden}
+    .wrap{max-width:760px;margin:0 auto;padding:20px max(16px,env(safe-area-inset-right)) calc(56px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+    .brand{font-weight:800;letter-spacing:-.02em;color:var(--accent);font-size:14px;margin:4px 0 12px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);box-shadow:var(--shadow)}
+    h1{font-size:30px;line-height:1.3;margin:0 0 12px;letter-spacing:-.04em}
+    h3{font-size:18px;margin:0 0 8px}
+    p{margin:0}.muted{color:var(--muted)}
+    .lead{font-size:16px;color:var(--muted);margin-top:8px}
+    .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+    .info{background:#f8fafc;border:1px solid var(--line);border-radius:15px;padding:13px}
+    .info small{display:block;color:var(--muted);font-size:12px}.info strong{display:block;margin-top:3px;font-size:17px}
+    button,a.btn,label{touch-action:manipulation}
+    button{font:inherit}
+    .btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:14px;min-height:52px;padding:12px 18px;font-weight:750;font-size:16px;cursor:pointer;text-decoration:none;-webkit-user-select:none;user-select:none}
+    .btn-primary{background:var(--accent);color:#fff}.btn-secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+    .btn:disabled{opacity:.4;cursor:not-allowed}
+    .btn:focus-visible,.icon-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+    .full{width:100%}
+    .hidden{display:none!important}
+
+    /* 진행 표시 */
+    .topline{display:flex;justify-content:space-between;gap:12px;align-items:center;color:var(--muted);font-size:14px;margin-bottom:8px}
+    .topline-right{display:flex;align-items:center;gap:10px}
+    .reset-btn{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;min-height:36px;padding:4px 14px;font-size:13px;font-weight:700;cursor:pointer}
+    .reset-btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+    .progress{height:8px;background:#e9edf2;border-radius:999px;overflow:hidden;margin-bottom:16px}.progress>div{height:100%;background:var(--accent);width:0;transition:width .2s ease}
+    .qnum{font-weight:800;color:var(--accent);font-size:13px;margin-bottom:7px}
+    .question{font-weight:800;font-size:21px;line-height:1.5;letter-spacing:-.025em;margin-bottom:18px}
+
+    /* 5지선다 */
+    .choice-list{display:grid;gap:10px}
+    .choice{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);border-radius:15px;padding:14px 15px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s}
+    .choice.is-selected{border-color:var(--accent);background:var(--accent-soft)}
+    .choice:focus-within{outline:3px solid var(--accent);outline-offset:1px}
+    .choice input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--accent);flex:0 0 auto}
+    .choice span{font-size:15.5px}
+    @media (hover:hover){.choice:hover{border-color:#b9c8da}}
+
+    /* 하단 고정 이동 버튼 (엄지 닿는 위치) */
+    .nav{position:sticky;bottom:0;z-index:5;display:flex;gap:10px;background:var(--card);margin:20px calc(var(--pad) * -1) calc(var(--pad) * -1);padding:14px var(--pad) calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);border-radius:0 0 var(--radius) var(--radius)}
+    .nav #backBtn{flex:0 0 96px}.nav #nextBtn{flex:1}
+
+    /* 1~5 척도 */
+    .poles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+    .pole{display:flex;gap:10px;align-items:flex-start;background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px 13px;font-size:14.5px;line-height:1.5}
+    .pole b{flex:0 0 26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px}
+    .scale-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+    .scale-option{position:relative}
+    .scale-option input{position:absolute;inset:0;opacity:0;margin:0;pointer-events:none}
+    .scale-option label{display:flex;align-items:center;justify-content:center;min-height:54px;border:1px solid var(--line);border-radius:13px;background:#fff;font-weight:800;font-size:18px;cursor:pointer;transition:border-color .15s,background .15s}
+    .scale-option input:checked+label{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+    .scale-option input:focus-visible+label{outline:3px solid var(--accent);outline-offset:2px}
+    .scale-hint{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+    .scale-hint span:nth-child(2){text-align:center}.scale-hint span:last-child{text-align:right}
+
+    /* 결과 */
+    .result-hero{padding:24px}.eyebrow{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:7px}
+    .nickname{font-size:27px;line-height:1.35;font-weight:900;letter-spacing:-.04em;margin:4px 0 10px}
+    .nickname .x{display:block;font-size:20px;color:var(--muted);font-weight:700;margin:2px 0}
+    .type-name{font-weight:800;color:var(--muted);margin-bottom:12px}
+    .secondary{margin-top:17px;background:#f7f8fa;border-radius:15px;padding:14px 15px;border:1px solid var(--line)}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.mini{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+    .score-big{font-size:40px;font-weight:900;letter-spacing:-.04em}.score-big small{font-size:16px;color:var(--muted);font-weight:600}.chem-label{font-weight:800;margin-top:5px}
+    .tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}.tag{border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:13px;background:#fff}
+    .bars{display:grid;gap:14px;margin-top:15px}.bar-head{display:flex;justify-content:space-between;gap:10px;font-size:14px;margin-bottom:5px}.bar-head span{color:var(--muted);flex:0 0 auto}
+    .track{height:10px;background:#edf0f3;border-radius:999px;overflow:hidden}.fill{height:100%;border-radius:999px;min-width:4px;transition:width .5s ease}
+    .footnote{margin-top:12px;background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:15px;color:var(--muted);font-size:13px}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+    .legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.legend-item{border:1px solid var(--line);border-radius:14px;padding:12px}.legend-item strong{font-size:14px}.legend-item div{font-size:12.5px;color:var(--muted);margin-top:3px}
+    .privacy{font-size:12px;color:var(--muted);margin-top:14px}
+
+    /* 결과 이미지 저장 창 */
+    .modal{position:fixed;inset:0;z-index:50;background:rgba(15,23,32,.6);display:flex;align-items:flex-end;justify-content:center;padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
+    .modal-box{background:#fff;border-radius:20px;width:100%;max-width:480px;max-height:100%;display:flex;flex-direction:column;padding:16px;overflow:auto}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .icon-btn{border:0;background:#f1f3f6;border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer}
+    .modal-box img{display:block;width:100%;max-height:58vh;object-fit:contain;border-radius:12px;border:1px solid var(--line);background:var(--bg);-webkit-touch-callout:default}
+    .modal-tip{font-size:13px;color:var(--muted);text-align:center;margin:10px 0 12px}
+    .modal-actions{display:grid;gap:8px}
+    @media (min-width:621px){.modal{align-items:center}}
+
+    @media (max-width:620px){
+      :root{--pad:18px;--radius:18px}
+      .wrap{padding-top:14px}
+      h1{font-size:25px}.question{font-size:19px;margin-bottom:16px}
+      .info-grid{grid-template-columns:repeat(3,1fr);gap:8px}.info{padding:10px}.info strong{font-size:15px}
+      .two-col{grid-template-columns:1fr}.legend{grid-template-columns:1fr;gap:8px}
+      .choice{padding:13px 14px}.choice span{font-size:15px}
+      .poles{grid-template-columns:1fr}
+      .nickname{font-size:24px}
+      .actions{grid-template-columns:1fr}
+    }
+    @media (max-width:360px){.info-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="brand">천원사 기관·기업체 탐방</div>
+
+    <section id="intro" class="card">
+      <h1>나는 천원사에서 어떤 일을 잘할까?</h1>
+      <p class="lead">20개의 질문으로 알아보는 <strong>천원사 직무 DNA 테스트</strong></p>
+      <div class="info-grid">
+        <div class="info"><small>문항</small><strong>20개</strong></div>
+        <div class="info"><small>예상 시간</small><strong>약 6~8분</strong></div>
+        <div class="info"><small>결과</small><strong>5가지 DNA</strong></div>
+      </div>
+      <p class="muted">정답은 없습니다. 가장 좋아 보이는 답이 아니라 <strong>내가 실제로 먼저 해보고 싶은 행동</strong>을 골라주세요. 두 선택지가 비슷하다면 오래 고민하지 말고 조금 더 마음이 가는 쪽을 선택하면 됩니다.</p>
+      <div class="legend">
+        <div class="legend-item"><strong>편집·연구형</strong><div>도서 편집, 교정교열, 자료조사, 번역·감수</div></div>
+        <div class="legend-item"><strong>콘텐츠·기획·마케팅형</strong><div>도서 기획, 콘텐츠, 홍보·SNS, 굿즈 기획</div></div>
+        <div class="legend-item"><strong>운영·관리형</strong><div>회계, 인사, 총무, 계약, 일정·재고관리</div></div>
+        <div class="legend-item"><strong>디자인·제작형</strong><div>표지, 본문 레이아웃, 사진, 인쇄데이터, 상품디자인</div></div>
+        <div class="legend-item"><strong>고객·유통·소통형</strong><div>서점·매장, 고객응대, 온라인몰, 행사장 판매, 물류·유통</div></div>
+      </div>
+      <p class="privacy">※ 이 테스트는 채용 적성검사나 표준화된 심리검사가 아닌 기관탐방용 직무 체험 콘텐츠입니다. 응답은 외부 서버로 전송되지 않으며, 개인정보를 수집하지 않습니다.</p>
+      <button id="startBtn" type="button" class="btn btn-primary full" style="margin-top:20px">테스트 시작하기</button>
+    </section>
+
+    <section id="quiz" class="hidden">
+      <div class="topline"><span id="sectionLabel">직무 DNA</span><span class="topline-right"><span id="progressText">1 / 20</span><button id="quizResetBtn" type="button" class="reset-btn">처음으로</button></span></div>
+      <div class="progress" role="progressbar" aria-label="응답 진행률" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0"><div id="progressBar"></div></div>
+      <div class="card">
+        <div id="qnum" class="qnum">Q1</div>
+        <div id="question" class="question"></div>
+        <div id="choiceArea" role="radiogroup" aria-labelledby="question"></div>
+        <div class="nav">
+          <button id="backBtn" type="button" class="btn btn-secondary">이전</button>
+          <button id="nextBtn" type="button" class="btn btn-primary" disabled>다음</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="result" class="hidden">
+      <div class="card result-hero">
+        <div class="eyebrow">나의 천원사 직무 DNA</div>
+        <div id="nickname" class="nickname"></div>
+        <div id="typeName" class="type-name"></div>
+        <p id="typeDesc" class="muted"></p>
+        <div id="secondary" class="secondary"></div>
+      </div>
+
+      <div class="two-col">
+        <div class="mini">
+          <div class="eyebrow">천원사 케미지수</div>
+          <div class="score-big"><span id="chemScore">0</span><small> / 100</small></div>
+          <div id="chemLabel" class="chem-label"></div>
+          <p id="chemText" class="muted" style="margin-top:8px;font-size:13px"></p>
+        </div>
+        <div class="mini">
+          <div class="eyebrow">천원사에서 경험해볼 만한 일</div>
+          <div id="jobTags" class="tags"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>5가지 직무 DNA 점수</h3>
+        <p class="muted" style="font-size:13px">15문항 중 각 유형을 고른 횟수입니다. 막대는 가장 높은 점수를 기준으로 표시했습니다.</p>
+        <div id="bars" class="bars"></div>
+      </div>
+
+      <div class="footnote">이 결과는 입사 가능성이나 합격률을 뜻하지 않습니다. 내가 어떤 종류의 업무에 더 자연스럽게 관심을 느끼는지 살펴보는 직무 체험 결과입니다.</div>
+      <div class="actions">
+        <button id="saveBtn" type="button" class="btn btn-primary">결과 이미지 저장</button>
+        <button id="restartBtn" type="button" class="btn btn-secondary">처음부터 다시 하기</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="saveModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+    <div class="modal-box">
+      <div class="modal-head"><strong id="saveTitle">결과 이미지</strong><button id="closeModal" type="button" class="icon-btn" aria-label="닫기">✕</button></div>
+      <img id="saveImg" alt="나의 천원사 직무 DNA 결과 이미지" />
+      <p class="modal-tip">이미지를 길게 눌러 사진에 저장할 수 있어요.</p>
+      <div class="modal-actions">
+        <button id="shareBtn" type="button" class="btn btn-primary hidden">공유하기</button>
+        <a id="downloadLink" class="btn btn-secondary" download="천원사_직무DNA_결과.png" href="#">이미지 파일로 받기</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  'use strict';
+
+  const TYPES = {
+    edit: {
+      name:'편집·연구형', nickname:'원고 속 숨은 의미를 찾는 탐정',
+      desc:'글과 자료를 깊이 살피고, 정확한 의미와 표현을 찾아 책의 완성도를 높이는 일에 자연스럽게 관심이 가는 편입니다.',
+      jobs:['도서 편집','교정·교열','자료조사','번역·감수','아카이브'], color:'#576b95'
+    },
+    content: {
+      name:'콘텐츠·기획·마케팅형', nickname:'아이디어를 현실로 만드는 프로듀서',
+      desc:'새로운 아이디어를 떠올리고, 그것을 사람들이 관심을 가질 콘텐츠와 홍보 방식으로 발전시키는 일을 즐기는 편입니다.',
+      jobs:['도서 기획','콘텐츠 기획','홍보·마케팅','SNS 콘텐츠','굿즈 기획'], color:'#9a6336'
+    },
+    ops: {
+      name:'운영·관리형', nickname:'회사를 움직이는 숨은 컨트롤타워',
+      desc:'일정·비용·자료·절차를 정리하고 여러 업무가 안정적으로 돌아가도록 만드는 데 강점을 보이는 편입니다.',
+      jobs:['회계·총무','계약·일정관리','인사·업무관리','재고관리','업무지원'], color:'#58766a'
+    },
+    design: {
+      name:'디자인·제작형', nickname:'책과 상품에 얼굴을 만드는 비주얼 디렉터',
+      desc:'글과 이미지를 시각적으로 구성하고, 표지·본문·사진·상품을 실제 결과물로 완성하는 일에 흥미를 느끼는 편입니다.',
+      jobs:['책 표지 디자인','본문·사진 레이아웃','상품 디자인','인디자인 편집','인쇄데이터 제작'], color:'#855f8e'
+    },
+    customer: {
+      name:'고객·유통·소통형', nickname:'사람과 답을 찾아 움직이는 해결사',
+      desc:'고객과 직접 소통하고, 서점·온라인몰·행사장 판매·물류 등 책과 상품이 사람에게 도달하는 과정을 움직이는 일에 강점을 보이는 편입니다.',
+      jobs:['서점·매장 운영','고객응대','행사장 판매','온라인몰','물류·유통'], color:'#8a7042'
+    }
+  };
+  const TYPE_KEYS = Object.keys(TYPES);
+
+  // 1~15: [질문, [[선택지, 유형]...]]
+  const JOB_QUESTIONS = [
+    ['새로운 책의 원고를 처음 받았습니다. 자연스럽게 가장 먼저 관심이 가는 것은?', [
+      ['글의 흐름과 내용에 빠진 부분은 없는지 살펴본다.','edit'],
+      ['이 책의 핵심을 어떻게 사람들에게 흥미롭게 전달할지 생각한다.','content'],
+      ['언제까지 어떤 순서로 작업해야 하는지 먼저 정리한다.','ops'],
+      ['이 내용이 책의 표지와 페이지에서는 어떤 모습으로 보일지 상상한다.','design'],
+      ['서점이나 온라인몰에서 실제 독자들이 이 책을 보면 어떤 반응을 보일지 궁금하다.','customer']
+    ]],
+    ['새로운 책을 만드는 첫 기획회의가 열렸습니다. 내가 가장 맡아보고 싶은 역할은?', [
+      ['이 책을 한마디로 설명할 수 있는 콘셉트와 아이디어를 제안한다.','content'],
+      ['해야 할 일, 담당자, 일정과 필요한 비용을 정리한다.','ops'],
+      ['표지와 본문의 전체적인 분위기를 이미지로 만들어본다.','design'],
+      ['서점 고객이나 예상 독자들에게 직접 질문해 어떤 책을 원하는지 알아본다.','customer'],
+      ['비슷한 책과 관련 자료를 찾아 내용의 방향을 검토한다.','edit']
+    ]],
+    ['책을 인쇄하기 이틀 전, 예상보다 큰 수정 요청이 들어왔습니다.', [
+      ['어디까지 수정해야 하는지 파악하고 작업 순서를 다시 짠다.','ops'],
+      ['수정 때문에 페이지가 달라지는 부분을 빠르게 재구성해본다.','design'],
+      ['출간을 기다리는 서점·거래처에 바로 연락해 상황을 설명하고 입고 일정을 맞춘다.','customer'],
+      ['수정한 문장과 내용에 또 다른 오류가 생기지 않았는지 확인한다.','edit'],
+      ['변경된 내용에 맞춰 책을 소개하는 방법도 바꿀 필요가 있는지 생각한다.','content']
+    ]],
+    ['오래전에 출판된 책을 새롭게 개정해 출간하려고 합니다. 가장 해보고 싶은 일은?', [
+      ['오래된 표지와 본문을 지금 독자에게 어울리는 모습으로 바꿔본다.','design'],
+      ['서점 고객이나 독자들에게 이 책에 대한 의견을 직접 들어본다.','customer'],
+      ['옛 원고와 새 원고를 비교하면서 정확히 무엇이 달라졌는지 확인한다.','edit'],
+      ['새로운 독자층이 관심을 가질 만한 개정판 콘셉트를 생각한다.','content'],
+      ['수정 범위와 제작비, 일정이 어느 정도 필요한지 정리한다.','ops']
+    ]],
+    ['외부 행사장에서 천원사의 책과 상품을 판매하는 부스를 운영하게 되었습니다. 판매 시작 한 시간 전입니다. 내가 가장 먼저 확인하고 싶은 것은?', [
+      ['방문객이 어디로 들어오고 어떻게 상품을 보고 구매하게 되는지 직접 둘러본다.','customer'],
+      ['책 소개문이나 안내자료에 잘못된 내용이 없는지 확인한다.','edit'],
+      ['사람들이 그냥 지나치지 않도록 흥미로운 홍보 문구나 판매 아이디어를 생각한다.','content'],
+      ['판매인원·상품수량·결제준비·운영시간 등이 체크리스트대로 준비됐는지 확인한다.','ops'],
+      ['배너·책 진열·가격표·안내판 등이 한눈에 잘 보이는지 살펴본다.','design']
+    ]],
+    ['회사에서 새로운 AI 도구를 업무에 사용해보라고 합니다. 가장 먼저 시험해보고 싶은 것은?', [
+      ['자료를 찾거나 긴 원고를 검토하는 데 얼마나 도움이 되는지 시험한다.','edit'],
+      ['새로운 홍보 아이디어나 콘텐츠를 만드는 데 활용해본다.','content'],
+      ['반복해서 처리하는 자료와 행정업무를 줄일 수 있는지 알아본다.','ops'],
+      ['책 표지 시안이나 이미지·레이아웃 제작에 활용해본다.','design'],
+      ['서점 고객응대나 행사장 판매 업무에 활용할 방법을 찾아본다.','customer']
+    ]],
+    ['온라인 서점에서 사람들이 책의 상세페이지를 많이 보지만 구매로 잘 이어지지 않습니다.', [
+      ['사람의 마음을 움직일 만한 소개 방식이나 메시지를 다시 생각한다.','content'],
+      ['가격·재고·배송일 같은 판매 정보가 정확하고 빠짐없이 등록되어 있는지 점검한다.','ops'],
+      ['상세페이지의 이미지와 정보가 한눈에 잘 들어오는지 다시 구성해본다.','design'],
+      ['실제 고객 몇 명에게 상세페이지를 보여주고 구매하기 불편한 점이 있는지 물어본다.','customer'],
+      ['책 소개문이 실제 책의 내용과 정확하게 맞는지 다시 살펴본다.','edit']
+    ]],
+    ['인쇄소에서 예정한 날짜에 책을 납품하기 어렵다는 연락이 왔습니다.', [
+      ['전체 출간 일정에 어떤 영향을 주는지 계산하고 대안을 세운다.','ops'],
+      ['제작방식을 바꾸면 시간을 줄일 수 있는 부분이 있는지 살펴본다.','design'],
+      ['주문한 서점과 예약 고객에게 먼저 연락해 상황을 알리고 받을 날짜를 다시 조율한다.','customer'],
+      ['급하게 수정하다가 내용이나 문구에 오류가 생기지 않는지 확인한다.','edit'],
+      ['출간 일정 변경을 독자에게 어떻게 알릴지 방법을 생각한다.','content']
+    ]],
+    ['새로운 굿즈 상품을 하나 만든다면 가장 먼저 하고 싶은 일은?', [
+      ['사람들이 실제로 사용할 모습을 생각하면서 모양과 색상을 구상한다.','design'],
+      ['서점이나 행사장 판매 부스에서 고객들에게 어떤 상품을 원하는지 직접 물어본다.','customer'],
+      ['상품에 사용할 문구나 상징이 어떤 의미인지 정확하게 확인한다.','edit'],
+      ['사람들에게 기억될 만한 이야기와 콘셉트를 만들어본다.','content'],
+      ['제작단가와 수량, 판매가격, 납기를 계산해본다.','ops']
+    ]],
+    ['서점이나 온라인몰을 이용한 고객이 회사에 불만을 제기했습니다. 가장 먼저 하고 싶은 행동은?', [
+      ['고객이 무엇 때문에 불편했는지 이야기를 충분히 들어본다.','customer'],
+      ['문제가 된 책에 오탈자나 내용 오류가 있었는지 직접 확인한다.','edit'],
+      ['이번 문제를 앞으로의 상품이나 서비스 개선 아이디어로 연결해본다.','content'],
+      ['어떤 과정에서 문제가 생겼고 어떻게 처리해야 하는지 정리한다.','ops'],
+      ['책의 인쇄·포장·사진·색상 등에 문제가 있었는지도 확인한다.','design']
+    ]],
+    ['하루 동안 다른 업무 없이 내가 원하는 일 하나에 몰입할 수 있습니다. 무엇을 고르고 싶은가요?', [
+      ['흩어져 있는 자료를 읽고 정리해서 하나의 완성된 글이나 자료로 만든다.','edit'],
+      ['아직 해보지 않은 새로운 책이나 콘텐츠 아이디어를 만들어본다.','content'],
+      ['복잡하게 되어 있는 자료나 업무방식을 깔끔하게 정리한다.','ops'],
+      ['책이나 상품의 디자인 시안을 직접 만들어본다.','design'],
+      ['서점이나 판매 부스에서 고객을 직접 만나 이야기를 들어본다.','customer']
+    ]],
+    ['회의에서 사람들의 의견이 서로 달라 결론이 나지 않습니다. 나는 어떤 방식이 편한가요?', [
+      ['우리가 누구에게 무엇을 전달하려는지 목표부터 다시 생각해본다.','content'],
+      ['결정해야 할 항목과 기준을 정리해 하나씩 결론을 낸다.','ops'],
+      ['말로만 논의하지 말고 간단한 시안이나 예시를 만들어 보여준다.','design'],
+      ['각자의 이야기를 들어보고 서로 받아들일 수 있는 지점을 찾아본다.','customer'],
+      ['관련 자료와 사실을 확인해 어떤 의견이 근거가 있는지 살펴본다.','edit']
+    ]],
+    ['어떤 일을 마쳤을 때 다음 중 무엇에서 가장 큰 만족감을 느낄 것 같나요?', [
+      ['계획한 일정과 비용 안에서 일이 문제없이 끝났을 때','ops'],
+      ['실제 결과물이 보기 좋고 완성도 높게 나왔을 때','design'],
+      ['서점 고객이나 행사장 판매 부스 방문객에게서 바로 좋은 반응을 들었을 때','customer'],
+      ['내용과 표현을 정확하게 완성했다고 느꼈을 때','edit'],
+      ['내가 생각한 아이디어가 사람들의 새로운 관심을 끌었을 때','content']
+    ]],
+    ['한 번도 해보지 않은 새로운 업무를 맡았습니다. 나는 보통 어떻게 시작할 것 같은가요?', [
+      ['우선 간단한 모양이나 예시를 만들어보면서 감을 잡는다.','design'],
+      ['그 일을 해본 사람에게 물어보거나 실제 매장·판매 장소에서 어떻게 처리하는지 먼저 살펴본다.','customer'],
+      ['설명서와 기존 자료를 충분히 읽고 이해한 뒤 시작한다.','edit'],
+      ['일단 작은 아이디어를 시험해보고 반응을 보면서 발전시킨다.','content'],
+      ['해야 할 일을 작은 단계로 나누고 일정부터 정한다.','ops']
+    ]],
+    ['5년 뒤 직장에서 어떤 모습이 되어 있다면 가장 만족스러울 것 같나요?', [
+      ['고객의 요구와 매장·판매 상황을 잘 이해해서 문제가 생기면 가장 먼저 찾는 사람','customer'],
+      ['중요한 책과 자료를 믿고 맡길 수 있는 편집·연구 전문가','edit'],
+      ['새로운 콘텐츠와 사업 아이디어를 계속 만들어내는 사람','content'],
+      ['여러 업무가 안정적으로 돌아가게 만드는 핵심 운영 담당자','ops'],
+      ['내가 만든 책과 상품의 디자인을 사람들이 알아보는 사람','design']
+    ]]
+  ];
+
+  // 16~20: [질문, 1쪽 설명, 5쪽 설명, 역채점 여부, 가중치]
+  // 양쪽 모두 긍정적으로 읽히도록 표현. 가치판단 성격이 강한 16·20번은 가중치를 낮춤.
+  const CHEM_QUESTIONS = [
+    ['업무 범위에 대해 나는 어느 쪽에 더 가깝나요?', '맡은 역할에 집중해 깊이 있게 해내는 편이다.', '필요하면 원래 담당을 넘어 다른 일도 함께 챙기는 편이다.', false, 0.5],
+    ['협업 방식에 대해 나는 어느 쪽에 더 가깝나요?', '일을 진행하는 중간에도 다른 사람과 자주 공유하고 조율하는 편이다.', '우선 혼자 충분히 완성한 뒤 결과를 공유하는 편이다.', true, 1],
+    ['일 처리 방식에 대해 나는 어느 쪽에 더 가깝나요?', '우선 빠르게 결과를 만들고 나중에 수정해가는 방식이 편하다.', '시간이 조금 더 걸려도 처음부터 정확하게 확인하면서 하는 편이다.', false, 1],
+    ['새로운 도구와 방법에 대해 나는 어느 쪽에 더 가깝나요?', '새로운 도구가 나오면 직접 사용해보면서 가능성을 알아보는 편이다.', '충분히 검증된 뒤 안정적인 방법을 사용하는 편이다.', true, 1],
+    ['일할 때 나에게 더 큰 힘이 되는 것은?', '일의 방식과 조건이 분명하게 정리되어 있을 때', '내가 하는 일이 어떤 의미와 가치를 갖는지 알 때', false, 0.5]
+  ];
+
+  const STORE_KEY = 'cws-job-dna-v2';
+
+  const answers = new Array(20).fill(null);
+  let index = 0;
+  let stage = 'intro';
+  let imageUrl = null, imageFile = null;
+
+  const $ = id => document.getElementById(id);
+  const intro = $('intro'), quiz = $('quiz'), result = $('result');
+  const question = $('question'), area = $('choiceArea');
+  const nextBtn = $('nextBtn'), backBtn = $('backBtn');
+
+  /* ---------- 저장 / 복원 (새로고침 대비) ---------- */
+  function save() {
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({answers, index, stage})); } catch (e) {}
+  }
+  function clearSaved() { try { sessionStorage.removeItem(STORE_KEY); } catch (e) {} }
+  function restore() {
+    let data = null;
+    try { data = JSON.parse(sessionStorage.getItem(STORE_KEY)); } catch (e) {}
+    if (!data || !Array.isArray(data.answers) || data.answers.length !== 20) return;
+    const valid = data.answers.every((v, i) => v === null || (i < 15 ? TYPE_KEYS.includes(v) : [1,2,3,4,5].includes(v)));
+    if (!valid) return;
+    data.answers.forEach((v, i) => { answers[i] = v; });
+    index = Math.min(Math.max(Number(data.index) || 0, 0), 19);
+    const complete = answers.every(v => v !== null);
+    if (data.stage === 'result' && complete) showResult();
+    else if (data.stage === 'quiz') { show('quiz'); render(); }
+  }
+
+  /* ---------- 화면 전환 ---------- */
+  function show(name) {
+    stage = name;
+    intro.classList.toggle('hidden', name !== 'intro');
+    quiz.classList.toggle('hidden', name !== 'quiz');
+    result.classList.toggle('hidden', name !== 'result');
+    window.scrollTo(0, 0);
+    save();
+  }
+
+  /* ---------- 문항 표시 ---------- */
+  function render() {
+    $('sectionLabel').textContent = index < 15 ? '직무 DNA' : '업무스타일';
+    $('progressText').textContent = `${index + 1} / 20`;
+    updateProgress();
+    $('qnum').textContent = `Q${index + 1}`;
+    area.innerHTML = '';
+
+    if (index < 15) {
+      const [text, options] = JOB_QUESTIONS[index];
+      question.textContent = text;
+      const list = document.createElement('div'); list.className = 'choice-list';
+      options.forEach((opt, i) => {
+        const label = document.createElement('label'); label.className = 'choice';
+        const input = document.createElement('input'); input.type = 'radio'; input.name = 'answer'; input.value = opt[1];
+        if (answers[index] === opt[1]) { input.checked = true; label.classList.add('is-selected'); }
+        input.addEventListener('change', () => {
+          answers[index] = opt[1];
+          list.querySelectorAll('.choice').forEach(el => el.classList.remove('is-selected'));
+          label.classList.add('is-selected');
+          onAnswered();
+        });
+        const span = document.createElement('span'); span.textContent = `${String.fromCharCode(65 + i)}. ${opt[0]}`;
+        label.append(input, span); list.appendChild(label);
+      });
+      area.appendChild(list);
+    } else {
+      const [text, left, right] = CHEM_QUESTIONS[index - 15];
+      question.textContent = text;
+
+      const poles = document.createElement('div'); poles.className = 'poles';
+      [[1, left], [5, right]].forEach(([n, t]) => {
+        const p = document.createElement('div'); p.className = 'pole';
+        const b = document.createElement('b'); b.textContent = n;
+        const s = document.createElement('span'); s.textContent = t;
+        p.append(b, s); poles.appendChild(p);
+      });
+      area.appendChild(poles);
+
+      const grid = document.createElement('div'); grid.className = 'scale-grid';
+      for (let n = 1; n <= 5; n++) {
+        const box = document.createElement('div'); box.className = 'scale-option';
+        const input = document.createElement('input'); input.type = 'radio'; input.name = 'answer'; input.id = `scale-${index}-${n}`; input.value = String(n);
+        input.setAttribute('aria-label', n === 1 ? `1: ${left}` : n === 5 ? `5: ${right}` : n === 3 ? '3: 중간' : String(n));
+        if (answers[index] === n) input.checked = true;
+        input.addEventListener('change', () => { answers[index] = n; onAnswered(); });
+        const label = document.createElement('label'); label.setAttribute('for', input.id); label.textContent = String(n);
+        box.append(input, label); grid.appendChild(box);
+      }
+      area.appendChild(grid);
+
+      const hint = document.createElement('div'); hint.className = 'scale-hint';
+      hint.innerHTML = '<span>← 1번에 가까움</span><span>중간</span><span>5번에 가까움 →</span>';
+      area.appendChild(hint);
+    }
+
+    backBtn.disabled = index === 0;
+    nextBtn.disabled = answers[index] === null;
+    nextBtn.textContent = index === 19 ? '결과 보기' : '다음';
+  }
+
+  function onAnswered() { nextBtn.disabled = false; updateProgress(); save(); }
+
+  function updateProgress() {
+    const done = answers.filter(v => v !== null).length;
+    $('progressBar').style.width = `${(done / 20) * 100}%`;
+    document.querySelector('.progress').setAttribute('aria-valuenow', String(done));
+  }
+
+  /* ---------- 채점 ---------- */
+  // 55~100점. 모두 '중간(3)'이면 약 78점.
+  function getChemResult() {
+    let sum = 0, weight = 0;
+    CHEM_QUESTIONS.forEach((q, i) => {
+      const raw = Number(answers[15 + i]);
+      const v = q[3] ? 6 - raw : raw;
+      sum += q[4] * (v - 1) / 4;
+      weight += q[4];
+    });
+    return Math.round(55 + 45 * (sum / weight));
+  }
+
+  function chemMessage(chem) {
+    if (chem >= 90) return ['천원사와 상당히 닮은 업무스타일', '협업·유연성·정확성·새로운 방식에 대한 태도에서 천원사의 업무환경과 겹치는 부분이 많이 나타났습니다.'];
+    if (chem >= 82) return ['천원사 스타일과 잘 통하는 편', '여러 업무를 함께 조율하고 배우는 환경과 연결되는 부분이 비교적 많이 나타났습니다.'];
+    if (chem >= 73) return ['천원사의 여러 업무와 연결점이 있는 편', '업무 방식에 따라 잘 맞는 영역과 자신만의 방식이 함께 나타납니다.'];
+    if (chem >= 64) return ['자신만의 일하는 방식이 뚜렷한 편', '천원사의 일반적인 업무방식과 다른 부분도 있지만, 직무에 따라 그것이 오히려 강점이 될 수 있습니다.'];
+    return ['나만의 색깔이 분명한 업무스타일', '좋고 나쁨의 의미는 아닙니다. 자신에게 잘 맞는 조직과 업무환경이 무엇인지 생각해볼 수 있는 결과입니다.'];
+  }
+
+  // 동점 처리: ① Q15(5년 뒤 모습)에서 고른 유형 우선 ② 더 나중에 고른 유형 우선
+  function computeResult() {
+    const scores = {}, last = {};
+    TYPE_KEYS.forEach(k => { scores[k] = 0; last[k] = -1; });
+    for (let i = 0; i < 15; i++) { scores[answers[i]]++; last[answers[i]] = i; }
+    const pref = answers[14];
+    const ranked = TYPE_KEYS.slice().sort((a, b) =>
+      (scores[b] - scores[a]) || ((b === pref) - (a === pref)) || (last[b] - last[a]));
+    const max = scores[ranked[0]];
+    const topCount = ranked.filter(k => scores[k] === max).length;
+    const mode = topCount >= 3 ? 'multi' : topCount === 2 ? 'combo' : 'single';
+    const a = TYPES[ranked[0]], b = TYPES[ranked[1]];
+
+    let titleLines, typeName, desc, secondaryHtml, jobs;
+    if (mode === 'multi') {
+      const keys = ranked.slice(0, 3);
+      titleLines = ['여러 강점을 함께 가진 멀티 DNA형'];
+      typeName = keys.map(k => TYPES[k].name).join(' · ');
+      desc = '한 가지 직무보다 여러 종류의 업무에 관심이 고르게 나타났습니다. 실제 경험을 통해 어떤 환경에서 가장 몰입하는지 확인해보면 좋습니다.';
+      secondaryHtml = '<strong>특징</strong><div class="muted" style="margin-top:4px">여러 직무를 연결해서 보는 폭이 넓은 편입니다.</div>';
+      jobs = interleave(keys, 3);
+    } else if (mode === 'combo') {
+      titleLines = [a.nickname, b.nickname];
+      typeName = `${a.name} × ${b.name} 복합형`;
+      desc = `${a.desc} 또한 ${b.desc}`;
+      secondaryHtml = '<strong>두 성향이 똑같이 강한 복합형</strong><div class="muted" style="margin-top:4px">두 가지 강점을 함께 살릴 수 있는 업무에서 특히 빛날 수 있습니다.</div>';
+      jobs = interleave(ranked.slice(0, 2), 4);
+    } else if (scores[ranked[1]] === 0) {
+      titleLines = [a.nickname];
+      typeName = a.name;
+      desc = a.desc;
+      secondaryHtml = '<strong>한 가지 DNA가 아주 뚜렷한 유형</strong><div class="muted" style="margin-top:4px">모든 문항에서 같은 방향의 선택이 나타났습니다.</div>';
+      jobs = a.jobs.slice();
+    } else {
+      titleLines = [a.nickname];
+      typeName = a.name;
+      desc = a.desc;
+      secondaryHtml = `<span class="muted">보조 DNA</span><div style="font-weight:800;margin-top:4px">${b.name} · ${b.nickname}</div>`;
+      jobs = unique([...a.jobs, ...b.jobs.slice(0, 3)]);
+    }
+    const chem = getChemResult();
+    const [chemLabel, chemText] = chemMessage(chem);
+    return { mode, scores, ranked, max, titleLines, typeName, desc, secondaryHtml, jobs, chem, chemLabel, chemText };
+  }
+
+  function interleave(keys, per) {
+    const out = [];
+    for (let i = 0; i < per; i++) keys.forEach(k => { const j = TYPES[k].jobs[i]; if (j) out.push(j); });
+    return unique(out);
+  }
+  function unique(arr) { return arr.filter((v, i) => arr.indexOf(v) === i); }
+
+  /* ---------- 결과 표시 ---------- */
+  function showResult() {
+    const r = computeResult();
+    const nick = $('nickname'); nick.innerHTML = '';
+    r.titleLines.forEach((t, i) => {
+      if (i > 0) { const x = document.createElement('span'); x.className = 'x'; x.textContent = '×'; nick.appendChild(x); }
+      nick.appendChild(document.createTextNode(t));
+    });
+    $('typeName').textContent = r.typeName;
+    $('typeDesc').textContent = r.desc;
+    $('secondary').innerHTML = r.secondaryHtml;
+    $('jobTags').innerHTML = r.jobs.map(j => `<span class="tag">${j}</span>`).join('');
+    $('chemScore').textContent = r.chem;
+    $('chemLabel').textContent = r.chemLabel;
+    $('chemText').textContent = r.chemText;
+    $('bars').innerHTML = r.ranked.map(k => {
+      const t = TYPES[k], v = r.scores[k];
+      const pct = r.max ? (v / r.max) * 100 : 0;
+      return `<div><div class="bar-head"><strong>${t.name}</strong><span>${v}점</span></div><div class="track"><div class="fill" style="width:${Math.max(pct, 2)}%;background:${t.color}"></div></div></div>`;
+    }).join('');
+    show('result');
+  }
+
+  /* ---------- 결과 이미지 (1080×1920, 휴대폰 화면·스토리 비율) ---------- */
+  const FONT = '-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif';
+
+  function wrap(ctx, text, maxW) {
+    const words = text.split(' '), lines = [];
+    let line = '';
+    const pushLong = w => { // 한 단어가 너무 길면 글자 단위로 자름
+      let cur = '';
+      for (const ch of w) { if (ctx.measureText(cur + ch).width > maxW && cur) { lines.push(cur); cur = ch; } else cur += ch; }
+      return cur;
+    };
+    words.forEach(w => {
+      const test = line ? `${line} ${w}` : w;
+      if (ctx.measureText(test).width <= maxW) line = test;
+      else if (!line) line = pushLong(w);
+      else { lines.push(line); line = ctx.measureText(w).width > maxW ? pushLong(w) : w; }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+  function rr(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+
+  function drawResultImage(r, height) {
+    const W = 1080, H = height || 1920, L = 120, CW = W - L * 2;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    x.textBaseline = 'alphabetic';
+
+    x.fillStyle = '#f6f7f9'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#ffffff'; rr(x, 60, 60, W - 120, H - 120, 44); x.fill();
+    x.strokeStyle = '#e5e7eb'; x.lineWidth = 2; x.stroke();
+
+    let y = 190;
+    x.fillStyle = '#285b9a'; x.font = `800 34px ${FONT}`; x.fillText('천원사 직무 DNA 테스트', L, y);
+    y += 80;
+    x.fillStyle = '#667085'; x.font = `700 32px ${FONT}`; x.fillText('나의 천원사 직무 DNA', L, y);
+
+    // 제목(별명)
+    y += 30;
+    r.titleLines.forEach((t, i) => {
+      if (i > 0) { y += 62; x.fillStyle = '#667085'; x.font = `700 44px ${FONT}`; x.fillText('×', L, y); }
+      x.fillStyle = '#17202a'; x.font = `900 66px ${FONT}`;
+      wrap(x, t, CW).forEach(line => { y += 86; x.fillText(line, L, y); });
+    });
+
+    // 유형 이름
+    y += 30;
+    x.fillStyle = '#667085'; x.font = `800 34px ${FONT}`;
+    wrap(x, r.typeName, CW).forEach(line => { y += 48; x.fillText(line, L, y); });
+
+    // 케미지수
+    y += 50;
+    x.font = `800 34px ${FONT}`;
+    const cl = wrap(x, r.chemLabel, CW - 80);
+    const boxH = 230 + cl.length * 46;
+    x.fillStyle = '#f8fafc'; rr(x, L, y, CW, boxH, 28); x.fill();
+    x.strokeStyle = '#e5e7eb'; x.lineWidth = 2; x.stroke();
+    x.fillStyle = '#285b9a'; x.font = `800 30px ${FONT}`; x.fillText('천원사 케미지수', L + 40, y + 62);
+    x.fillStyle = '#17202a'; x.font = `900 100px ${FONT}`; x.fillText(String(r.chem), L + 40, y + 170);
+    const sw = x.measureText(String(r.chem)).width;
+    x.fillStyle = '#667085'; x.font = `600 36px ${FONT}`; x.fillText('/ 100', L + 56 + sw, y + 170);
+    x.fillStyle = '#17202a'; x.font = `800 34px ${FONT}`;
+    cl.forEach((line, i) => x.fillText(line, L + 40, y + 230 + i * 46));
+    y += boxH;
+
+    // 점수 막대
+    y += 80;
+    x.fillStyle = '#17202a'; x.font = `800 36px ${FONT}`; x.fillText('5가지 직무 DNA 점수', L, y);
+    y += 20;
+    r.ranked.forEach(k => {
+      const t = TYPES[k], v = r.scores[k];
+      y += 62;
+      x.fillStyle = '#17202a'; x.font = `700 30px ${FONT}`; x.fillText(t.name, L, y);
+      x.fillStyle = '#667085'; x.font = `700 30px ${FONT}`;
+      const s = `${v}점`; x.fillText(s, L + CW - x.measureText(s).width, y);
+      y += 22;
+      x.fillStyle = '#edf0f3'; rr(x, L, y, CW, 18, 9); x.fill();
+      const w = Math.max(CW * (r.max ? v / r.max : 0), 18);
+      x.fillStyle = t.color; rr(x, L, y, w, 18, 9); x.fill();
+      y += 18;
+    });
+
+    // 경험해볼 만한 일
+    y += 90;
+    x.fillStyle = '#17202a'; x.font = `800 36px ${FONT}`; x.fillText('천원사에서 경험해볼 만한 일', L, y);
+    y += 30;
+    x.font = `600 30px ${FONT}`;
+    let tx = L;
+    const th = 62, gap = 14, padX = 26;
+    r.jobs.forEach(j => {
+      const w = x.measureText(j).width + padX * 2;
+      if (tx + w > L + CW) { tx = L; y += th + gap; }
+      x.fillStyle = '#ffffff'; rr(x, tx, y, w, th, th / 2); x.fill();
+      x.strokeStyle = '#d5dae1'; x.lineWidth = 2; x.stroke();
+      x.fillStyle = '#17202a'; x.fillText(j, tx + padX, y + 42);
+      tx += w + gap;
+    });
+    y += th;
+
+    // 내용이 길면 이미지 높이를 늘려 다시 그림
+    if (y + 230 > H) return drawResultImage(r, y + 230);
+
+    // 하단
+    x.fillStyle = '#667085'; x.font = `600 26px ${FONT}`;
+    x.fillText('※ 직무 체험용 결과이며 채용·합격과는 관계없습니다.', L, H - 170);
+    x.fillStyle = '#285b9a'; x.font = `800 30px ${FONT}`;
+    x.fillText('천원사 기관·기업체 탐방', L, H - 118);
+    return c;
+  }
+
+  function openSaveModal() {
+    const r = computeResult();
+    const canvas = drawResultImage(r);
+    const dataUrl = canvas.toDataURL('image/png');
+    $('saveImg').src = dataUrl;
+    const link = $('downloadLink');
+    link.href = dataUrl;
+
+    const shareBtn = $('shareBtn');
+    shareBtn.classList.add('hidden');
+    imageFile = null;
+    if (canvas.toBlob && navigator.canShare) {
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        try {
+          const file = new File([blob], '천원사_직무DNA_결과.png', {type: 'image/png'});
+          if (navigator.canShare({files: [file]})) { imageFile = file; shareBtn.classList.remove('hidden'); }
+        } catch (e) {}
+      }, 'image/png');
+    }
+    $('saveModal').classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    $('closeModal').focus();
+  }
+  function closeSaveModal() {
+    $('saveModal').classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  $('shareBtn').addEventListener('click', async () => {
+    if (!imageFile) return;
+    try { await navigator.share({files: [imageFile], title: '나의 천원사 직무 DNA'}); } catch (e) {}
+  });
+  $('closeModal').addEventListener('click', closeSaveModal);
+  $('saveModal').addEventListener('click', e => { if (e.target.id === 'saveModal') closeSaveModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSaveModal(); });
+
+  /* ---------- 처음으로 ---------- */
+  function resetAll() {
+    closeSaveModal();
+    answers.fill(null);
+    index = 0;
+    clearSaved();
+    show('intro');
+  }
+
+
+  /* ---------- 버튼 ---------- */
+  $('startBtn').addEventListener('click', () => { index = 0; show('quiz'); render(); });
+  backBtn.addEventListener('click', () => { if (index > 0) { index--; render(); window.scrollTo(0, 0); save(); } });
+  nextBtn.addEventListener('click', () => {
+    if (answers[index] === null) return;
+    if (index < 19) { index++; render(); window.scrollTo(0, 0); save(); }
+    else showResult();
+  });
+  $('saveBtn').addEventListener('click', openSaveModal);
+  $('restartBtn').addEventListener('click', resetAll);
+  $('quizResetBtn').addEventListener('click', () => {
+    if (answers.some(v => v !== null) && !confirm('지금까지의 응답이 모두 지워집니다. 처음으로 돌아갈까요?')) return;
+    resetAll();
+  });
+
+  restore();
+})();
+</script>
+</body>
+</html>
